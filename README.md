@@ -11,7 +11,7 @@
 [![License](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-€5-ffdd00?logo=paypal&logoColor=white)](https://paypal.me/PAYPAL_HANDLE/5EUR)
+[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-€5-ffdd00?logo=paypal&logoColor=white)](https://paypal.me/mrafiq89/5EUR)
 
 </div>
 
@@ -160,7 +160,7 @@ Mailbox archives contain personal data. The pipeline classifies and skips person
 
 ## Support
 
-If TacitGraph saves you time, you can [buy me a coffee (€5)](https://paypal.me/PAYPAL_HANDLE/5EUR) ☕ — and a ⭐ on the [main repository](https://github.com/MRafiqAsim/tacitgraph) helps others find it.
+If TacitGraph saves you time, you can [buy me a coffee (€5)](https://paypal.me/mrafiq89/5EUR) ☕ — and a ⭐ on the [main repository](https://github.com/MRafiqAsim/tacitgraph) helps others find it.
 
 ## License
 

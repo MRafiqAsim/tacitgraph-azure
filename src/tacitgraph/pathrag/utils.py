@@ -7,6 +7,7 @@ import logging
 import os
 import re
 import xml.etree.ElementTree as ET
+from collections.abc import Callable
 from dataclasses import dataclass
 from functools import wraps
 from hashlib import md5
@@ -48,7 +49,7 @@ def set_logger(log_file: str):
 class EmbeddingFunc:
     embedding_dim: int
     max_token_size: int
-    func: callable
+    func: Callable[..., Any]
     concurrent_limit: int = 16
 
     def __post_init__(self):
@@ -183,7 +184,7 @@ def is_float_regex(value):
     return bool(re.match(r"^[-+]?[0-9]*\.?[0-9]+$", value))
 
 
-def truncate_list_by_token_size(list_data: list, key: callable, max_token_size: int):
+def truncate_list_by_token_size(list_data: list, key: Callable[..., Any], max_token_size: int):
 
     if max_token_size <= 0:
         return []

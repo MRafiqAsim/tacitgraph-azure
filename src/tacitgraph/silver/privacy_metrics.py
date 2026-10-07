@@ -16,6 +16,7 @@ import hashlib
 import logging
 import math
 from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -769,7 +770,7 @@ class TextPrivacyAnalyzer:
         original_texts: list[str],
         anonymized_texts: list[str],
         quasi_identifier_extractors: dict[str, callable] = None,
-        sensitive_attribute_extractor: callable = None,
+        sensitive_attribute_extractor: Callable[..., Any] = None,
     ) -> PrivacyMetricsResult:
         """
         Analyze privacy metrics for anonymized texts.
@@ -841,7 +842,7 @@ class TextPrivacyAnalyzer:
         return qis
 
     def _extract_sensitive_attributes(
-        self, text: str, extractor: callable = None
+        self, text: str, extractor: Callable[..., Any] = None
     ) -> list[SensitiveAttribute]:
         """Extract sensitive attributes from text"""
         if extractor:

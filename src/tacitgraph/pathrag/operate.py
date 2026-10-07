@@ -4,6 +4,8 @@ import re
 import time
 import warnings
 from collections import Counter, defaultdict
+from collections.abc import Callable
+from typing import Any
 
 from tqdm.asyncio import tqdm as tqdm_async
 
@@ -58,7 +60,7 @@ async def _handle_entity_relation_summary(
     description: str,
     global_config: dict,
 ) -> str:
-    use_llm_func: callable = global_config["llm_model_func"]
+    use_llm_func: Callable[..., Any] = global_config["llm_model_func"]
     llm_max_tokens = global_config["llm_model_max_token_size"]
     tiktoken_model_name = global_config["tiktoken_model_name"]
     summary_max_tokens = global_config["entity_summary_to_max_tokens"]
@@ -245,7 +247,7 @@ async def extract_entities(
     global_config: dict,
 ) -> BaseGraphStorage | None:
     time.sleep(20)
-    use_llm_func: callable = global_config["llm_model_func"]
+    use_llm_func: Callable[..., Any] = global_config["llm_model_func"]
     entity_extract_max_gleaning = global_config["entity_extract_max_gleaning"]
 
     ordered_chunks = list(chunks.items())

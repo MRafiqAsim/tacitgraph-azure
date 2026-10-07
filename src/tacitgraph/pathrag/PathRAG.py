@@ -1,9 +1,10 @@
 import asyncio
 import os
+from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from functools import partial
-from typing import cast
+from typing import Any, cast
 
 from tqdm.asyncio import tqdm as tqdm_async
 
@@ -138,7 +139,7 @@ class PathRAG:
     embedding_batch_num: int = 32
     embedding_func_max_async: int = 16
 
-    llm_model_func: callable = openai_complete
+    llm_model_func: Callable[..., Any] = openai_complete
     llm_model_name: str = "gpt-4o"
     llm_model_max_token_size: int = 32768
     llm_model_max_async: int = 16
@@ -149,7 +150,7 @@ class PathRAG:
     enable_llm_cache: bool = True
 
     addon_params: dict = field(default_factory=dict)
-    convert_response_to_json_func: callable = convert_response_to_json
+    convert_response_to_json_func: Callable[..., Any] = convert_response_to_json
 
     def __post_init__(self):
         log_file = os.path.join("PathRAG.log")

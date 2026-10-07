@@ -391,7 +391,9 @@ class AttachmentProcessor:
 
         return separator.join(texts)
 
-    def process_all_attachments(self, progress_callback: Callable[..., Any] | None = None) -> dict[str, Any]:
+    def process_all_attachments(
+        self, progress_callback: Callable[..., Any] | None = None
+    ) -> dict[str, Any]:
         """
         Process all attachments in the Bronze layer.
 

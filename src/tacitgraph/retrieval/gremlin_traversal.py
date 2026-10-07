@@ -403,7 +403,7 @@ class GremlinGraphClient:
         """
         all_chunks = self.get_source_chunks_batch(entity_ids, limit_per_entity)
         chunk_scores: dict[str, int] = defaultdict(int)
-        for eid, chunks in all_chunks.items():
+        for _eid, chunks in all_chunks.items():
             for cid in chunks:
                 chunk_scores[cid] += 1
 

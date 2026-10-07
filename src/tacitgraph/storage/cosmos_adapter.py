@@ -187,7 +187,7 @@ class CosmosAdapter:
     # =========================================================================
 
     def _build_node_query(
-        self, node_id: str, name: str, node_type: str, properties: dict = None
+        self, node_id: str, name: str, node_type: str, properties: dict | None = None
     ) -> str:
         """Build Gremlin upsert query for a node."""
         props = properties or {}
@@ -212,7 +212,7 @@ class CosmosAdapter:
         )
 
     def _build_edge_query(
-        self, source_id: str, target_id: str, edge_type: str, properties: dict = None
+        self, source_id: str, target_id: str, edge_type: str, properties: dict | None = None
     ) -> str:
         """Build Gremlin upsert query for an edge."""
         props = properties or {}
@@ -233,13 +233,15 @@ class CosmosAdapter:
             f"){prop_str}"
         )
 
-    def upsert_node(self, node_id: str, name: str, node_type: str, properties: dict = None) -> None:
+    def upsert_node(
+        self, node_id: str, name: str, node_type: str, properties: dict | None = None
+    ) -> None:
         """Add or update a graph node."""
         query = self._build_node_query(node_id, name, node_type, properties)
         self._gremlin_query(query)
 
     def upsert_edge(
-        self, source_id: str, target_id: str, edge_type: str, properties: dict = None
+        self, source_id: str, target_id: str, edge_type: str, properties: dict | None = None
     ) -> None:
         """Add or update a graph edge."""
         query = self._build_edge_query(source_id, target_id, edge_type, properties)
@@ -270,7 +272,7 @@ class CosmosAdapter:
         self._gremlin_query(query)
 
     def _build_add_node_query(
-        self, node_id: str, name: str, node_type: str, properties: dict = None
+        self, node_id: str, name: str, node_type: str, properties: dict | None = None
     ) -> str:
         """Build Gremlin addV query (direct insert, no existence check). Use after drop."""
         props = properties or {}
@@ -296,7 +298,7 @@ class CosmosAdapter:
         )
 
     def _build_add_edge_query(
-        self, source_id: str, target_id: str, edge_type: str, properties: dict = None
+        self, source_id: str, target_id: str, edge_type: str, properties: dict | None = None
     ) -> str:
         """Build Gremlin addE query (direct insert, no existence check). Use after drop."""
         props = properties or {}
@@ -552,7 +554,7 @@ class CosmosAdapter:
         return None
 
     def search_nodes(
-        self, name_substring: str, node_type: str = None, limit: int = 10
+        self, name_substring: str, node_type: str | None = None, limit: int = 10
     ) -> list[dict]:
         """Search nodes by name substring."""
         safe_name = name_substring.lower().replace("'", "\\'")
@@ -571,7 +573,7 @@ class CosmosAdapter:
         return [self._parse_gremlin_node(r) for r in results]
 
     def get_neighbors(
-        self, node_id: str, direction: str = "both", edge_type: str = None, limit: int = 20
+        self, node_id: str, direction: str = "both", edge_type: str | None = None, limit: int = 20
     ) -> list[dict]:
         """
         Get neighboring nodes.
@@ -668,12 +670,9 @@ class CosmosAdapter:
             )
         return paths
 
-    def get_node_count(self, node_type: str = None) -> int:
+    def get_node_count(self, node_type: str | None = None) -> int:
         """Count nodes, optionally by type."""
-        if node_type:
-            query = f"g.V().has('node_type', '{node_type}').count()"
-        else:
-            query = "g.V().count()"
+        query = f"g.V().has('node_type', '{node_type}').count()" if node_type else "g.V().count()"
         results = self._gremlin_query(query)
         return results[0] if results else 0
 

@@ -529,7 +529,7 @@ class RetrievalToolkit:
             if entity_vectors:
                 self._entity_ids = entity_ids
                 self._entity_embeddings = np.array(entity_vectors, dtype=np.float32)
-                self._entity_id_to_name = {eid: name for eid, name in zip(entity_ids, entity_names)}
+                self._entity_id_to_name = dict(zip(entity_ids, entity_names, strict=False))
                 logger.info(
                     f"Loaded {len(entity_ids)} entity embeddings from AI Search (shape {self._entity_embeddings.shape})"
                 )
@@ -637,7 +637,7 @@ class RetrievalToolkit:
 
             # Build normalized embedding array
             candidate_vecs = {}
-            for i, (eid, name, node_type, score) in enumerate(candidates):
+            for i, (eid, _name, _node_type, _score) in enumerate(candidates):
                 if candidate_embs[i] is not None:
                     vec = np.array(candidate_embs[i])
                     norm = np.linalg.norm(vec)
@@ -652,7 +652,7 @@ class RetrievalToolkit:
             matched_embeddings = []
             seen_names = set()
 
-            for entity_id, name, node_type, score in candidates:
+            for entity_id, name, _node_type, _score in candidates:
                 name_lower = name.lower()
                 if name_lower in seen_names:
                     continue
@@ -1394,7 +1394,7 @@ class RetrievalToolkit:
                 )
 
             type_counts = {}
-            for node_id, node_data in nodes.items():
+            for _node_id, node_data in nodes.items():
                 node_type = node_data.get("node_type", node_data.get("type", "UNKNOWN"))
                 type_counts[node_type] = type_counts.get(node_type, 0) + 1
 
@@ -1424,7 +1424,7 @@ class RetrievalToolkit:
 
             # Find matching entity
             matching_nodes = []
-            for node_id, node in graph.nodes.items():
+            for _node_id, node in graph.nodes.items():
                 if entity_name.lower() in node.name.lower():
                     matching_nodes.append(node)
 
@@ -1546,7 +1546,7 @@ class RetrievalToolkit:
 
     def temporal_filter(
         self,
-        chunk_ids: list[str] = None,
+        chunk_ids: list[str] | None = None,
         start_date: str | None = None,
         end_date: str | None = None,
         date_range: str | None = None,
@@ -1709,7 +1709,7 @@ class RetrievalToolkit:
         self,
         query: str,
         llm_client,
-        model: str = None,
+        model: str | None = None,
         level: int = 0,
         max_chunks_per_community: int = 3,
     ) -> ToolResult:
@@ -2107,7 +2107,7 @@ class RetrievalToolkit:
 
         source_chunk_ids = []
         source_communities = []
-        for comm_id, score in top_matches:
+        for comm_id, _score in top_matches:
             comm = comm_lookup.get(comm_id)
             if comm:
                 source_communities.append(comm_id)
@@ -2120,7 +2120,7 @@ class RetrievalToolkit:
         self,
         query: str,
         llm_client,
-        model: str = None,
+        model: str | None = None,
         top_entities: int = 10,
         max_relationships: int = 20,
     ) -> ToolResult:
@@ -2270,7 +2270,7 @@ class RetrievalToolkit:
                     if not node:
                         continue
                     rel_count = 0
-                    for edge_id, edge in graph.edges.items():
+                    for _edge_id, edge in graph.edges.items():
                         if rel_count >= max_relationships:
                             break
                         if edge.source_id == node_id or edge.target_id == node_id:

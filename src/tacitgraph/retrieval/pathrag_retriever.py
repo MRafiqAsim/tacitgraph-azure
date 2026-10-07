@@ -6,6 +6,7 @@ Uses PathRAG's flow-based path pruning for query-time path finding.
 """
 
 import asyncio
+import itertools
 import logging
 from collections import defaultdict
 from dataclasses import dataclass
@@ -208,7 +209,7 @@ class PathRAGRetriever:
                 )
 
             # Add entity-to-entity edges only
-            for edge_id, edge in graph.edges.items():
+            for _edge_id, edge in graph.edges.items():
                 if edge.edge_type in EXCLUDE_EDGE_TYPES:
                     continue
                 if edge.source_id in entity_ids and edge.target_id in entity_ids:
@@ -278,7 +279,7 @@ class PathRAGRetriever:
                 return
             if current == target:
                 result[pair_key]["paths"].append(list(path))
-                for u, v in zip(path[:-1], path[1:]):
+                for u, v in itertools.pairwise(path):
                     result[pair_key]["edges"].add(tuple(sorted((u, v))))
                 if depth == 1:
                     path_stats["1-hop"] += 1
@@ -301,7 +302,7 @@ class PathRAGRetriever:
             path_set = set(path)  # O(1) membership check
             for neighbor in _get_neighbors(current):
                 if neighbor not in path_set:
-                    dfs(neighbor, target, path + [neighbor], depth + 1, pair_key)
+                    dfs(neighbor, target, [*path, neighbor], depth + 1, pair_key)
                     # Re-check after recursion
                     if len(result[pair_key]["paths"]) >= MAX_PATHS_PER_PAIR:
                         return
@@ -391,7 +392,7 @@ class PathRAGRetriever:
                 path_weight += edge_weights.get(edge, 0)
             path_weights.append(path_weight / (len(p) - 1) if len(p) > 1 else 0)
 
-        return list(zip(paths, path_weights))
+        return list(zip(paths, path_weights, strict=False))
 
     def path_to_natural_language(self, path: list[str]) -> str:
         """
@@ -436,7 +437,9 @@ class PathRAGRetriever:
 
         return "".join(parts)
 
-    async def retrieve(self, entity_ids: list[str], max_paths: int = None) -> list[PathResult]:
+    async def retrieve(
+        self, entity_ids: list[str], max_paths: int | None = None
+    ) -> list[PathResult]:
         """
         Main retrieval method using PathRAG algorithms.
 
@@ -536,7 +539,7 @@ class PathRAGRetriever:
 
         # Build path-level Gremlin data lookup for node names/types
         gremlin_paths = {}
-        for (s, t), paths in all_paths.items():
+        for (_s, _t), paths in all_paths.items():
             for p in paths:
                 for n in p["nodes"]:
                     gremlin_paths[n["id"]] = n
@@ -572,7 +575,7 @@ class PathRAGRetriever:
             for i in range(len(path) - 1):
                 # Find matching Gremlin path that has this edge
                 edge_found = False
-                for (s, t), paths_data in all_paths.items():
+                for (_s, _t), paths_data in all_paths.items():
                     for p in paths_data:
                         p_ids = [n["id"] for n in p["nodes"]]
                         for j in range(len(p_ids) - 1):
@@ -592,7 +595,7 @@ class PathRAGRetriever:
 
             # Natural language description
             nl_parts = []
-            for i, node_id in enumerate(path):
+            for i in range(len(path)):
                 entity_desc = f"Entity '{path_names[i]}' ({path_types[i]})"
                 if i == 0:
                     nl_parts.append(entity_desc)
@@ -620,7 +623,7 @@ class PathRAGRetriever:
     async def _retrieve_via_local(self, entity_ids: list[str], max_paths: int) -> list[PathResult]:
         """PathRAG retrieval using local in-memory graph (fallback)."""
         # Step 1: Find all paths using DFS
-        result, path_stats, one_hop, two_hop, three_hop = await self.find_paths_between_entities(
+        result, path_stats, _one_hop, _two_hop, _three_hop = await self.find_paths_between_entities(
             entity_ids
         )
 

@@ -177,41 +177,42 @@ class CommunityDetector:
         if not HAS_NETWORKX:
             raise ImportError("networkx is required for community detection")
 
-        print("Starting community detection...")
+        logger.info("Starting community detection...")
 
         # Convert to NetworkX
-        print(f"  Converting {len(self.graph.nodes)} nodes to NetworkX...")
+        logger.info(f"  Converting {len(self.graph.nodes)} nodes to NetworkX...")
         nx_graph = self.graph.to_networkx()
-        print(f"  NetworkX graph: {len(nx_graph.nodes())} nodes, {len(nx_graph.edges())} edges")
+        logger.info(
+            f"  NetworkX graph: {len(nx_graph.nodes())} nodes, {len(nx_graph.edges())} edges"
+        )
 
         # Filter to entity nodes only (exclude CHUNK nodes for community detection)
         entity_nodes = [
             n for n in nx_graph.nodes() if self.graph.nodes[n].node_type not in ["CHUNK", "THREAD"]
         ]
         entity_subgraph = nx_graph.subgraph(entity_nodes).copy()
-        print(
+        logger.info(
             f"  Entity subgraph: {len(entity_subgraph.nodes())} nodes, {len(entity_subgraph.edges())} edges"
         )
 
         if HAS_LEIDEN:
-            print("  Running Leiden algorithm...")
+            logger.info("  Running Leiden algorithm...")
             self._detect_with_leiden(entity_subgraph, progress_callback)
         else:
-            print("  Running Louvain algorithm...")
+            logger.info("  Running Louvain algorithm...")
             self._detect_with_louvain(entity_subgraph, progress_callback)
 
         # Build hierarchy
-        print("  Building hierarchy...")
+        logger.info("  Building hierarchy...")
         self._build_hierarchy()
 
         # Generate summaries
         total = sum(len(c) for c in self.communities.values())
-        print(
+        logger.info(
             f"Detected {total} communities across {len(self.communities)} levels, generating summaries..."
         )
         self._generate_summaries(progress_callback)
 
-        print(f"Community detection complete: {total} communities")
         logger.info(f"Community detection complete: {total} communities")
         return self.communities
 
@@ -394,7 +395,7 @@ class CommunityDetector:
 
                 processed += 1
                 if processed % 50 == 0 or processed == total_communities:
-                    print(f"  Summaries: {processed}/{total_communities}")
+                    logger.info(f"  Summaries: {processed}/{total_communities}")
                 if progress_callback and processed % 10 == 0:
                     progress_callback(processed, total_communities)
 

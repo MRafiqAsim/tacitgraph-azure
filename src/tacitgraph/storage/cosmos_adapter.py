@@ -345,7 +345,6 @@ class CosmosAdapter:
         deduped = list(seen.values())
         if len(deduped) < len(nodes):
             logger.info(f"  Deduplicated: {len(nodes)} → {len(deduped)} nodes")
-            print(f"  Deduplicated: {len(nodes)} → {len(deduped)} nodes")
 
         # Step 2: Build all queries
         build_query = self._build_add_node_query if direct_insert else self._build_node_query
@@ -393,9 +392,8 @@ class CosmosAdapter:
                         logger.info(
                             f"  Nodes: {count + failed}/{total} ({count} ok, {failed} failed)"
                         )
-                        print(f"  Nodes: {count + failed}/{total} ({count} ok, {failed} failed)")
 
-        print(f"  Nodes complete: {count}/{total} ({failed} failed)")
+        logger.info(f"  Nodes complete: {count}/{total} ({failed} failed)")
         return count
 
     def bulk_upsert_edges(
@@ -428,7 +426,6 @@ class CosmosAdapter:
         deduped = list(seen.values())
         if len(deduped) < len(edges):
             logger.info(f"  Deduplicated: {len(edges)} → {len(deduped)} edges")
-            print(f"  Deduplicated: {len(edges)} → {len(deduped)} edges")
 
         # Step 2: Build all queries
         build_query = self._build_add_edge_query if direct_insert else self._build_edge_query
@@ -476,9 +473,8 @@ class CosmosAdapter:
                         logger.info(
                             f"  Edges: {count + failed}/{total} ({count} ok, {failed} failed)"
                         )
-                        print(f"  Edges: {count + failed}/{total} ({count} ok, {failed} failed)")
 
-        print(f"  Edges complete: {count}/{total} ({failed} failed)")
+        logger.info(f"  Edges complete: {count}/{total} ({failed} failed)")
         return count
 
     def drop_all_vertices(self, batch_size: int = 500) -> int:
@@ -492,10 +488,8 @@ class CosmosAdapter:
                 break
             self._gremlin_query(f"g.V().limit({batch_size}).drop()")
             total_dropped += min(batch_size, remaining)
-            print(f"  Dropped batch — ~{remaining} remaining")
             logger.info(f"  Dropped batch — ~{remaining} remaining")
         logger.info(f"Graph cleared — {total_dropped} vertices dropped")
-        print(f"Graph cleared — {total_dropped} vertices dropped")
         return total_dropped
 
     # =========================================================================

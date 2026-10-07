@@ -1,30 +1,37 @@
+# TacitGraph chat app for Azure App Service.
+# Retrieval runs against Cosmos DB Gremlin + Azure AI Search, so the image only
+# needs the `azure` extra — no local NLP models (spaCy / torch) are installed.
+
 FROM python:3.11-slim
+
+COPY --from=ghcr.io/astral-sh/uv:0.9 /uv /uvx /bin/
+
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    PYTHONUNBUFFERED=1 \
+    TACITGRAPH_HOME=/app \
+    PATH="/app/.venv/bin:$PATH"
 
 WORKDIR /app
 
-# System deps
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    git \
-    && rm -rf /var/lib/apt/lists/*
+# Dependencies first, so code changes don't invalidate this layer
+COPY pyproject.toml uv.lock ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev --no-install-project --extra azure
 
-# Python deps — install in two stages for better caching
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# spaCy models (small models for cloud — LLM mode doesn't need trf)
-RUN python -m spacy download en_core_web_sm && \
-    python -m spacy download nl_core_news_sm
-
-# App code + config
-COPY src/ src/
+COPY README.md LICENSE NOTICE ./
 COPY config/ config/
-# Create empty data dirs (cloud mode doesn't need local files,
-# but app checks for gold_path existence when cosmos is not set)
-RUN mkdir -p data/gold_llm data/silver_llm
+COPY src/ src/
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev --extra azure
 
-# Gradio port (App Service uses 8000 by default, configurable via WEBSITES_PORT)
+# The app expects these paths to exist even when data comes from Azure services
+RUN mkdir -p data/gold_llm data/silver_llm \
+    && useradd --create-home --uid 1000 app \
+    && chown -R app:app /app
+USER app
+
+# App Service routes traffic to port 8000 by default (override with WEBSITES_PORT)
 EXPOSE 8000
 
-# Launch in LLM mode — all data from Cosmos Gremlin + Azure AI Search
-CMD ["python", "-m", "src.app", "--mode", "llm", "--port", "8000"]
+CMD ["tacitgraph-app", "--mode", "llm", "--port", "8000"]

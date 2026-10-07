@@ -2,7 +2,9 @@
 
 # TacitGraph · Azure
 
-### From PST to a knowledge RAG you can chat with — at enterprise scale on Azure.
+### From PST to a knowledge graph you can chat with — at enterprise scale on Azure
+
+**An end-to-end RAG pipeline** on Azure: ingestion, knowledge-graph construction and graph-aware retrieval as managed cloud services.
 
 *The cloud deployment of [TacitGraph](https://github.com/MRafiqAsim/tacitgraph): Synapse for processing, Cosmos DB for the knowledge graph, AI Search for retrieval and App Service for the chat UI.*
 

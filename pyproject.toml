@@ -1,7 +1,7 @@
 [project]
 name = "tacitgraph-azure"
 version = "0.1.0"
-description = "From PST to a knowledge RAG you can chat with — Azure deployment of TacitGraph (Synapse, Cosmos DB Gremlin, AI Search, App Service)."
+description = "From PST to a knowledge graph you can chat with: an end-to-end RAG pipeline — Azure deployment of TacitGraph (Synapse, Cosmos DB Gremlin, AI Search, App Service)."
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]

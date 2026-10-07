@@ -98,7 +98,7 @@ class CosmosAdapter:
             logger.info(f"Gremlin client connected: {self.gremlin_endpoint}")
         return self._gremlin_client
 
-    def _gremlin_query(self, query: str, max_retries: int = 10) -> list[dict]:
+    def _gremlin_query(self, query: str, max_retries: int = 10) -> list[Any]:
         """Execute a Gremlin query with retry on 429 (TooManyRequests).
 
         Cosmos DB Gremlin returns 429 as status code 500 with

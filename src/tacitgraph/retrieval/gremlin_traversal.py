@@ -54,7 +54,7 @@ class GremlinGraphClient:
             from tacitgraph.entity_registry import get_entity_node_types, get_structural_edge_types
 
             self._entity_types = get_entity_node_types()
-            self._structural_edges = get_structural_edge_types()
+            self._structural_edges: set[str] | frozenset[str] = get_structural_edge_types()
         except Exception:
             self._entity_types = {
                 "ORG",

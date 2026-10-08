@@ -25,27 +25,13 @@ TacitGraph turns Outlook archives into a knowledge graph you can question in pla
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    PST[PST archives] -->|local extraction| BR[(ADLS Gen2<br/>bronze/)]
-    subgraph Synapse["Azure Synapse (Spark notebooks)"]
-        N2[02 Silver processing]
-        N3[03 Gold: graph · communities · indexes]
-        N4[04 RAGAS evaluation]
-    end
-    BR --> N2 --> SV[(ADLS<br/>silver/)] --> N3
-    N3 --> GD[(ADLS<br/>gold/)]
-    N3 --> COS[(Cosmos DB<br/>Gremlin graph)]
-    N3 --> AIS[(Azure AI Search<br/>5 indexes)]
-    AOAI[Azure OpenAI<br/>GPT-4o · embeddings] -.-> N2 & N3 & APP
-    subgraph AppService["App Service (container)"]
-        APP[Gradio chat UI]
-    end
-    GD -->|graph for PathRAG| APP
-    COS -->|GraphRAG local search| APP
-    AIS -->|vector · entities · communities| APP
-    USER([Users]) <--> APP
-```
+### High level architecture
+
+![High level architecture](diagrams/high_level_architecture.png)
+
+### Data flow
+
+![Data flow](diagrams/data_flow_diagram.png)
 
 | Component | Service | Role |
 |---|---|---|
